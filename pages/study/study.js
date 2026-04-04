@@ -140,8 +140,7 @@ Page({
       this._audioCtx.obeyMuteSwitch = false
     }
     this._audioCtx.stop()
-    // 音频托管在 jsDelivr CDN（从 GitHub 加速分发），不占小程序包体积
-    this._audioCtx.src = `https://cdn.jsdelivr.net/gh/dgy924143558/gojuuon@master/audio/${roma}.mp3`
+    this._audioCtx.src = `/audio/${roma}.mp3`
     this._audioCtx.play()
   },
 
