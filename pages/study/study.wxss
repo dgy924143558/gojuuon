@@ -1,0 +1,321 @@
+/* pages/study/study.wxss */
+
+.page {
+  min-height: 100vh;
+  padding: 0 32rpx 60rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- nav ---- */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 100rpx 0 32rpx;
+}
+
+.nav-back {
+  font-size: 28rpx;
+  color: rgba(240,237,232,0.45);
+  padding: 8rpx 0;
+}
+
+.nav-back:active { opacity: 0.6; }
+
+.nav-round {
+  font-size: 26rpx;
+  color: rgba(240,237,232,0.3);
+  letter-spacing: 1rpx;
+}
+
+/* ---- progress ---- */
+.progress-wrap {
+  margin-bottom: 36rpx;
+}
+
+.progress-bar {
+  height: 6rpx;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6rpx;
+  overflow: hidden;
+  margin-bottom: 14rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #3aaa7a;
+  border-radius: 6rpx;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  font-size: 22rpx;
+  color: rgba(240,237,232,0.3);
+  text-align: right;
+}
+
+/* ---- stats ---- */
+.stats-row {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 48rpx;
+}
+
+.stat {
+  flex: 1;
+  background: #1a1a1c;
+  border: 1rpx solid rgba(255,255,255,0.07);
+  border-radius: 16rpx;
+  padding: 24rpx 16rpx;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 48rpx;
+  font-weight: 500;
+  color: #f0ede8;
+  line-height: 1.1;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 20rpx;
+  color: rgba(240,237,232,0.35);
+}
+
+/* ---- deck area ---- */
+.deck-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 480rpx;
+  position: relative;
+}
+
+/* 卡片 + 发音按钮横排 */
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+/* ---- card ---- */
+.card-wrap {
+  position: relative;
+  width: 480rpx;
+  height: 440rpx;
+  flex-shrink: 0;
+}
+
+.stack-shadow {
+  position: absolute;
+  width: 480rpx;
+  height: 440rpx;
+  background: #1a1a1c;
+  border: 1rpx solid rgba(255,255,255,0.07);
+  border-radius: 28rpx;
+}
+
+.card {
+  position: absolute;
+  top: 0; left: 0;
+  width: 480rpx;
+  height: 440rpx;
+  background: #1e1e20;
+  border: 1rpx solid rgba(255,255,255,0.12);
+  border-radius: 28rpx;
+  z-index: 10;
+  /* 翻转动画 */
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.back {
+  transform: rotateY(180deg);
+}
+
+.kana-big {
+  font-size: 140rpx;
+  line-height: 1;
+  color: #f0ede8;
+  letter-spacing: 12rpx;
+}
+
+.kana-answer {
+  font-size: 100rpx;
+  line-height: 1;
+  color: #c9a84c;
+  margin-bottom: 16rpx;
+}
+
+.roma-text {
+  font-size: 40rpx;
+  color: rgba(240,237,232,0.4);
+  letter-spacing: 4rpx;
+  font-weight: 300;
+}
+
+/* 第X轮标记 */
+.card-round-badge {
+  position: absolute;
+  top: 28rpx;
+  right: 28rpx;
+  background: rgba(201,168,76,0.15);
+  border: 1rpx solid rgba(201,168,76,0.5);
+  border-radius: 10rpx;
+  padding: 6rpx 18rpx;
+  font-size: 22rpx;
+  color: #c9a84c;
+  letter-spacing: 1rpx;
+}
+
+/* ---- 发音按钮（牌右侧） ---- */
+.audio-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+  flex-shrink: 0;
+}
+
+.audio-side:active .audio-icon-wrap {
+  opacity: 0.65;
+  transform: scale(0.93);
+}
+
+.audio-icon-wrap {
+  width: 80rpx;
+  height: 80rpx;
+  background: rgba(201,168,76,0.12);
+  border: 1rpx solid rgba(201,168,76,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.audio-icon {
+  font-size: 36rpx;
+  color: #c9a84c;
+  line-height: 1;
+}
+
+.audio-label {
+  font-size: 20rpx;
+  color: rgba(240,237,232,0.3);
+  letter-spacing: 1rpx;
+}
+
+/* ---- round over ---- */
+.round-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.round-over-icon {
+  font-size: 100rpx;
+  color: #3aaa7a;
+  margin-bottom: 24rpx;
+  line-height: 1;
+}
+
+.round-over-text {
+  font-size: 48rpx;
+  font-weight: 500;
+  color: #f0ede8;
+  margin-bottom: 12rpx;
+}
+
+.round-over-sub {
+  font-size: 28rpx;
+  color: rgba(240,237,232,0.45);
+  margin-bottom: 48rpx;
+}
+
+.round-over-btn {
+  background: #1a1a1c;
+  border: 1rpx solid rgba(255,255,255,0.15);
+  border-radius: 16rpx;
+  padding: 28rpx 60rpx;
+  font-size: 30rpx;
+  color: #f0ede8;
+}
+.round-over-btn:active { opacity: 0.7; }
+
+/* ---- 操作按钮（始终两个，高度一致） ---- */
+.action-area {
+  margin-top: 48rpx;
+}
+
+.btn-row {
+  display: flex;
+  gap: 20rpx;
+}
+
+.btn {
+  flex: 1;
+  border-radius: 20rpx;
+  padding: 28rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+}
+.btn:active { opacity: 0.75; transform: scale(0.97); }
+
+.btn-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.btn-retry {
+  background: rgba(232,84,58,0.1);
+  border: 1rpx solid rgba(232,84,58,0.3);
+}
+
+.btn-know {
+  background: rgba(58,170,122,0.1);
+  border: 1rpx solid rgba(58,170,122,0.3);
+}
+
+.btn-icon {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.btn-retry .btn-icon { color: #e8543a; }
+.btn-know .btn-icon  { color: #3aaa7a; }
+
+.btn-text {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #f0ede8;
+}
+
+.btn-sub {
+  font-size: 22rpx;
+  color: rgba(240,237,232,0.35);
+}

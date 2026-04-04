@@ -1,0 +1,25 @@
+<!-- pages/complete/complete.wxml -->
+<view class="page">
+
+  <view class="confetti-area">
+    <view class="big-check">✓</view>
+  </view>
+
+  <view class="result-block">
+    <view class="result-title">全部记住了！</view>
+    <view class="result-sub">你用了 {{rounds}} 轮完成了全部 {{total}} 张</view>
+  </view>
+
+  <view class="divider"></view>
+
+  <view class="remind-box">
+    <view class="remind-title">⚡ 不要忘了</view>
+    <view class="remind-text">今天你是无敌的，但明天就会忘！<br/>建议马上去做几道 N5 假名题巩固一下。</view>
+  </view>
+
+  <view class="actions">
+    <view class="btn-primary" bindtap="restart">再来一轮巩固</view>
+    <view class="btn-secondary" bindtap="goHome">回到首页</view>
+  </view>
+
+</view>

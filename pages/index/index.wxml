@@ -1,0 +1,39 @@
+<!-- pages/index/index.wxml -->
+<view class="page">
+
+  <view class="hero">
+    <view class="badge">2 小时记住假名</view>
+    <view class="title-jp">五十音図</view>
+    <view class="title-zh">记忆闪卡</view>
+    <view class="desc">翻牌 · 记住放一边 · 忘了塞底部<br/>反复几轮，全部拿下</view>
+  </view>
+
+  <view class="section-label">选择模式</view>
+
+  <view class="mode-list">
+    <view
+      wx:for="{{modes}}"
+      wx:key="id"
+      class="mode-card {{mode === item.id ? 'active' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="selectMode"
+    >
+      <view class="mode-label">{{item.label}}</view>
+      <view class="mode-desc">{{item.desc}}</view>
+      <view class="mode-check">{{mode === item.id ? '✓' : ''}}</view>
+    </view>
+  </view>
+
+  <view class="card-count">共 {{totalCards}} 张卡片</view>
+
+  <view class="start-btn" bindtap="startStudy">
+    <text>开始记忆</text>
+    <text class="arrow"> →</text>
+  </view>
+
+  <view class="tip-box">
+    <view class="tip-title">💡 怎么玩</view>
+    <view class="tip-text">点击卡片翻到背面 → 记住了就划走 → 没记住塞回底部 → 直到牌堆清空 → 再来一轮</view>
+  </view>
+
+</view>

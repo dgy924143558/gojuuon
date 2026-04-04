@@ -1,0 +1,17 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/study/study",
+    "pages/complete/complete"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#0e0e0f",
+    "navigationBarTitleText": "五十音図",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0e0e0f"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}
