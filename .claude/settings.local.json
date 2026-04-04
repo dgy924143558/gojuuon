@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip show:*)",
+      "Bash(where python:*)",
+      "Bash(pip install:*)",
+      "Bash(where pip:*)",
+      "Bash(where pip3:*)",
+      "Bash(py -m pip --version)",
+      "Bash(npm --version)",
+      "Bash(node scripts/gen-audio.js)",
+      "Bash(npm list:*)",
+      "Bash(node -e \"require\\(''''docx''''\\)\")",
+      "Bash(npm install:*)",
+      "Bash(node gen-doc.js)",
+      "Bash(npm init:*)",
+      "Bash(ls -la *.mp3)",
+      "Bash(ffmpeg -version)",
+      "Bash(node -e \"console.log\\(require\\(''''ffmpeg-static''''\\)\\)\")",
+      "Bash(node scripts/compress-audio.js)"
+    ]
+  }
+}

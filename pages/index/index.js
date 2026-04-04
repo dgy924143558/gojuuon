@@ -17,15 +17,14 @@ Page({
   },
 
   startStudy() {
-    // 每张牌加 viewCount，用于记录被看了几次
-    const deck = shuffle(gojuuon.map(c => ({ ...c, viewCount: 0 })))
+    // 每张牌携带 errorCount（不认识的次数）
+    const deck = shuffle(gojuuon.map(c => ({ ...c, errorCount: 0 })))
     getApp().globalData.session = {
       deck,
       known: [],
       mode: this.data.mode,
-      rounds: 0,
       total: gojuuon.length,
     }
     wx.navigateTo({ url: '/pages/study/study' })
-  }
+  },
 })

@@ -3,25 +3,16 @@ const { shuffle } = require('../../utils/gojuuon')
 
 Page({
   data: {
-    // 卡片数据
     frontChar: '',
-    backChar: '',
-    backRoma: '',
-    cardRoma: '',       // 当前牌罗马字（用于发音）
-    cardRound: 1,       // 当前牌被看到第几次
-    // 状态
-    flipped: false,     // 是否已翻面
-    animating: false,   // 动画/过渡中（禁止操作）
-    // 统计
+    cardRoma: '',
+    errorCount: 0,      // 当前牌被标记"不认识"的次数
+    cardExiting: false, // 退场动画
+    animating: false,
     deckCount: 0,
     knownCount: 0,
     total: 0,
-    rounds: 0,
     progress: 0,
-    // 牌堆层数（视觉）
     stackLayers: [],
-    // 是否结束
-    roundOver: false,
   },
 
   _session: null,
@@ -29,106 +20,82 @@ Page({
 
   onShow() {
     const session = getApp().globalData.session
-    if (!session) {
-      wx.navigateBack()
-      return
-    }
+    if (!session) { wx.navigateBack(); return }
     this._session = session
     this._renderCard()
   },
 
   onUnload() {
-    if (this._audioCtx) {
-      this._audioCtx.destroy()
-      this._audioCtx = null
-    }
+    if (this._audioCtx) { this._audioCtx.destroy(); this._audioCtx = null }
   },
 
   _renderCard() {
     const s = this._session
-    const layers = Math.min(s.deck.length - 1, 4)
-    const stackLayers = Array.from({ length: layers }, (_, i) => ({ i }))
 
     if (s.deck.length === 0) {
-      this.setData({ roundOver: true, deckCount: 0, knownCount: s.known.length })
+      // 全部认识 → 跳统计页
+      getApp().globalData.session = s
+      wx.redirectTo({ url: '/pages/complete/complete' })
       return
     }
 
     const card = s.deck[0]
-    let frontChar, backChar, backRoma
+    const layers = Math.min(s.deck.length - 1, 4)
+    const stackLayers = Array.from({ length: layers }, (_, i) => ({ i }))
 
-    if (s.mode === 'kata-hira') {
-      frontChar = card.kata
-      backChar = card.hira
-      backRoma = card.roma
-    } else if (s.mode === 'hira-kata') {
-      frontChar = card.hira
-      backChar = card.kata
-      backRoma = card.roma
-    } else {
-      // romaji mode: 正面同时显示两种假名，背面是罗马字
-      frontChar = card.kata + '  ' + card.hira
-      backChar = card.roma
-      backRoma = ''
-    }
+    let frontChar
+    if (s.mode === 'kata-hira')      frontChar = card.kata
+    else if (s.mode === 'hira-kata') frontChar = card.hira
+    else                              frontChar = card.kata + '  ' + card.hira
 
-    const progress = Math.round((s.known.length / s.total) * 100)
+    const progress = Math.round(s.known.length / s.total * 100)
 
     this.setData({
       frontChar,
-      backChar,
-      backRoma,
       cardRoma: card.roma,
-      cardRound: (card.viewCount || 0) + 1,
-      flipped: false,
-      roundOver: false,
+      errorCount: card.errorCount || 0,
+      cardExiting: false,
       animating: false,
       deckCount: s.deck.length,
       knownCount: s.known.length,
       total: s.total,
-      rounds: s.rounds,
       progress,
       stackLayers,
     })
   },
 
-  // ── 我知道了 → 直接移出牌堆，不翻牌 ──
+  // ── 认识 → 直接移出牌堆 ──
   markKnow() {
     if (this.data.animating) return
-    this.setData({ animating: true })
+    this.setData({ animating: true, cardExiting: true })
     const s = this._session
     const card = s.deck.shift()
     s.known.push(card)
     wx.vibrateShort({ type: 'medium' })
-    setTimeout(() => {
-      this._renderCard()
-    }, 250)
+    setTimeout(() => this._renderCard(), 350)
   },
 
-  // ── 我不知道 → 翻牌显示读音 + 自动播放 + 1.5s后放牌底 ──
+  // ── 不认识 → 打标记数字，放牌底 ──
   markRetry() {
     if (this.data.animating) return
-    this.setData({ flipped: true, animating: true })
+    const s = this._session
+    const card = s.deck[0]
+    card.errorCount = (card.errorCount || 0) + 1
+    // 先更新徽章，再做退场
+    this.setData({ errorCount: card.errorCount, animating: true })
     wx.vibrateShort({ type: 'light' })
-    // 翻牌动画完成后自动播放读音
     setTimeout(() => {
-      this._playAudio()
-    }, 420)
-    // 1.8s后放牌底，切下一张
-    setTimeout(() => {
-      const s = this._session
-      const card = s.deck.shift()
-      card.viewCount = (card.viewCount || 0) + 1
-      s.deck.push(card)
+      this.setData({ cardExiting: true })
       setTimeout(() => {
+        s.deck.shift()
+        s.deck.push(card)
         this._renderCard()
-      }, 250)
-    }, 1800)
+      }, 280)
+    }, 160)
   },
 
-  // ── 点击发音按钮（手动触发）──
-  playAudio(e) {
-    // 阻止冒泡，避免影响其他操作
+  // ── 发音按钮 ──
+  playAudio() {
     this._playAudio()
   },
 
@@ -142,21 +109,6 @@ Page({
     this._audioCtx.stop()
     this._audioCtx.src = `/audio/${roma}.mp3`
     this._audioCtx.play()
-  },
-
-  // ── 这轮牌空了 → 下一轮 ──
-  nextRound() {
-    const s = this._session
-    s.rounds += 1
-
-    if (s.known.length === s.total) {
-      getApp().globalData.session = s
-      wx.redirectTo({ url: '/pages/complete/complete' })
-      return
-    }
-
-    s.deck = shuffle([...s.deck])
-    this._renderCard()
   },
 
   goBack() {

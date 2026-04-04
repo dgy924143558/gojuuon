@@ -4,7 +4,6 @@
   <!-- 顶部导航 -->
   <view class="nav">
     <view class="nav-back" bindtap="goBack">← 返回</view>
-    <view class="nav-round">第 {{rounds + 1}} 轮</view>
   </view>
 
   <!-- 进度条 -->
@@ -15,58 +14,36 @@
     <view class="progress-text">已记住 {{knownCount}} / {{total}}</view>
   </view>
 
-  <!-- 牌堆统计 -->
+  <!-- 统计（2格：剩余 + 已记住） -->
   <view class="stats-row">
     <view class="stat">
       <view class="stat-num">{{deckCount}}</view>
-      <view class="stat-label">牌堆剩余</view>
+      <view class="stat-label">剩余</view>
     </view>
     <view class="stat">
       <view class="stat-num" style="color:#3aaa7a">{{knownCount}}</view>
       <view class="stat-label">已记住</view>
     </view>
-    <view class="stat">
-      <view class="stat-num" style="color:#c9a84c">{{rounds}}</view>
-      <view class="stat-label">已完成轮</view>
-    </view>
   </view>
 
   <!-- 牌堆区域 -->
   <view class="deck-area">
+    <view class="card-row">
 
-    <!-- 这轮结束提示 -->
-    <view wx:if="{{roundOver}}" class="round-over">
-      <view class="round-over-icon">✓</view>
-      <view class="round-over-text">这轮结束！</view>
-      <view class="round-over-sub">还有 {{total - knownCount}} 张没记住</view>
-      <view class="round-over-btn" bindtap="nextRound">继续下一轮 →</view>
-    </view>
-
-    <!-- 卡片 + 旁边发音按钮 -->
-    <view wx:else class="card-row">
-
-      <!-- 牌堆区（叠层 + 主卡片） -->
+      <!-- 牌堆 -->
       <view class="card-wrap">
-        <!-- 底部叠层（视觉） -->
         <view
           wx:for="{{stackLayers}}"
           wx:key="i"
           class="stack-shadow"
-          style="top: {{(stackLayers.length - item.i) * 6}}rpx; left: {{(stackLayers.length - item.i) * 4}}rpx; z-index: {{item.i}};"
+          style="top:{{(stackLayers.length-item.i)*6}}rpx; left:{{(stackLayers.length-item.i)*4}}rpx; z-index:{{item.i}};"
         ></view>
 
-        <!-- 主卡片 -->
-        <view class="card {{flipped ? 'flipped' : ''}}">
-          <!-- 正面 -->
-          <view class="card-face front">
-            <view wx:if="{{cardRound > 1}}" class="card-round-badge">第{{cardRound}}轮</view>
-            <view class="kana-big">{{frontChar}}</view>
-          </view>
-          <!-- 背面：翻开后显示答案 + 读音 -->
-          <view class="card-face back">
-            <view class="kana-answer">{{backChar}}</view>
-            <view wx:if="{{backRoma}}" class="roma-text">{{backRoma}}</view>
-          </view>
+        <!-- 主卡片：无翻牌，始终显示正面 -->
+        <view class="card {{cardExiting ? 'card-exit' : ''}}">
+          <!-- 不认识次数徽章（≥1次才显示） -->
+          <view wx:if="{{errorCount > 0}}" class="error-badge">{{errorCount}}</view>
+          <view class="kana-big">{{frontChar}}</view>
         </view>
       </view>
 
@@ -81,17 +58,17 @@
     </view>
   </view>
 
-  <!-- 操作按钮（始终显示两个，牌的位置不受影响） -->
-  <view wx:if="{{!roundOver}}" class="action-area">
+  <!-- 操作按钮（始终显示两个，位置固定） -->
+  <view class="action-area">
     <view class="btn-row">
       <view class="btn btn-retry {{animating ? 'btn-disabled' : ''}}" bindtap="markRetry">
-        <view class="btn-icon">↩</view>
-        <view class="btn-text">我不知道</view>
-        <view class="btn-sub">翻开放牌底</view>
+        <view class="btn-icon">✗</view>
+        <view class="btn-text">我不认识</view>
+        <view class="btn-sub">标记放牌底</view>
       </view>
       <view class="btn btn-know {{animating ? 'btn-disabled' : ''}}" bindtap="markKnow">
         <view class="btn-icon">✓</view>
-        <view class="btn-text">我知道了</view>
+        <view class="btn-text">我认识</view>
         <view class="btn-sub">放到旁边</view>
       </view>
     </view>
