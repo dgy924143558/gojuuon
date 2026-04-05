@@ -13,7 +13,6 @@
   align-items: center;
   padding: 100rpx 0 32rpx;
 }
-
 .nav-back {
   font-size: 28rpx;
   color: rgba(240,237,232,0.45);
@@ -31,27 +30,24 @@
   overflow: hidden;
   margin-bottom: 14rpx;
 }
-
 .progress-fill {
   height: 100%;
   background: #3aaa7a;
   border-radius: 6rpx;
   transition: width 0.4s ease;
 }
-
 .progress-text {
   font-size: 22rpx;
   color: rgba(240,237,232,0.3);
   text-align: right;
 }
 
-/* ---- stats（2格）---- */
+/* ---- stats ---- */
 .stats-row {
   display: flex;
   gap: 16rpx;
   margin-bottom: 48rpx;
 }
-
 .stat {
   flex: 1;
   background: #1a1a1c;
@@ -60,7 +56,6 @@
   padding: 24rpx 16rpx;
   text-align: center;
 }
-
 .stat-num {
   font-size: 56rpx;
   font-weight: 500;
@@ -68,7 +63,6 @@
   line-height: 1.1;
   margin-bottom: 8rpx;
 }
-
 .stat-label {
   font-size: 22rpx;
   color: rgba(240,237,232,0.35);
@@ -115,19 +109,39 @@
   border: 1rpx solid rgba(255,255,255,0.12);
   border-radius: 28rpx;
   z-index: 10;
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease, opacity 0.28s ease;
+}
+
+/* 翻牌 */
+.card-flipped { transform: rotateY(180deg); }
+
+/* 退场淡出 */
+.card-exit { opacity: 0.12; transform: scale(0.92); }
+.card-flipped.card-exit { opacity: 0.12; transform: rotateY(180deg) scale(0.92); }
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.28s ease, transform 0.28s ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.back { transform: rotateY(180deg); }
+
+/* ── 正面 ── */
+.kana-big {
+  font-size: 140rpx;
+  line-height: 1;
+  color: #f0ede8;
+  letter-spacing: 12rpx;
 }
 
-/* 退场动画 */
-.card-exit {
-  opacity: 0.15;
-  transform: scale(0.93);
-}
-
-/* ── 不认识次数徽章（右上角红色圆形）── */
+/* 错误次数徽章（右上角红圈）*/
 .error-badge {
   position: absolute;
   top: 22rpx;
@@ -143,15 +157,21 @@
   font-weight: 700;
   color: #fff;
   padding: 0 12rpx;
-  box-shadow: 0 2rpx 12rpx rgba(232,84,58,0.5);
-  transition: transform 0.15s ease;
+  box-shadow: 0 2rpx 12rpx rgba(232,84,58,0.45);
 }
 
-.kana-big {
-  font-size: 140rpx;
+/* ── 背面 ── */
+.kana-answer {
+  font-size: 96rpx;
   line-height: 1;
-  color: #f0ede8;
-  letter-spacing: 12rpx;
+  color: #c9a84c;
+  margin-bottom: 16rpx;
+}
+.roma-text {
+  font-size: 40rpx;
+  color: rgba(240,237,232,0.4);
+  letter-spacing: 4rpx;
+  font-weight: 300;
 }
 
 /* ---- 发音按钮（牌右侧）---- */
@@ -162,10 +182,7 @@
   gap: 10rpx;
   flex-shrink: 0;
 }
-.audio-side:active .audio-icon-wrap {
-  opacity: 0.65;
-  transform: scale(0.93);
-}
+.audio-side:active .audio-icon-wrap { opacity: 0.65; transform: scale(0.93); }
 
 .audio-icon-wrap {
   width: 80rpx;
@@ -178,31 +195,18 @@
   justify-content: center;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
-
-.audio-icon {
-  font-size: 36rpx;
-  color: #c9a84c;
-  line-height: 1;
-}
-
-.audio-label {
-  font-size: 20rpx;
-  color: rgba(240,237,232,0.3);
-  letter-spacing: 1rpx;
-}
+.audio-icon { font-size: 36rpx; color: #c9a84c; line-height: 1; }
+.audio-label { font-size: 20rpx; color: rgba(240,237,232,0.3); letter-spacing: 1rpx; }
 
 /* ---- 操作按钮 ---- */
 .action-area { margin-top: 48rpx; }
 
-.btn-row {
-  display: flex;
-  gap: 20rpx;
-}
+.btn-row { display: flex; gap: 20rpx; }
 
 .btn {
   flex: 1;
   border-radius: 20rpx;
-  padding: 28rpx 0;
+  padding: 24rpx 12rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -211,32 +215,55 @@
 }
 .btn:active { opacity: 0.75; transform: scale(0.97); }
 
-.btn-disabled {
-  opacity: 0.3;
-  pointer-events: none;
-}
+.btn-disabled { opacity: 0.3; pointer-events: none; }
 
 .btn-retry {
   background: rgba(232,84,58,0.1);
   border: 1rpx solid rgba(232,84,58,0.3);
 }
-
 .btn-know {
   background: rgba(58,170,122,0.1);
   border: 1rpx solid rgba(58,170,122,0.3);
 }
 
-.btn-icon { font-size: 40rpx; line-height: 1; }
+.btn-icon { font-size: 36rpx; line-height: 1; }
 .btn-retry .btn-icon { color: #e8543a; }
 .btn-know  .btn-icon { color: #3aaa7a; }
 
 .btn-text {
-  font-size: 30rpx;
+  font-size: 25rpx;
   font-weight: 500;
   color: #f0ede8;
+  text-align: center;
+}
+.btn-sub {
+  font-size: 20rpx;
+  color: rgba(240,237,232,0.35);
 }
 
-.btn-sub {
-  font-size: 22rpx;
-  color: rgba(240,237,232,0.35);
+/* ── 翻牌后：将其置于牌底 ── */
+.btn-bottom {
+  width: 100%;
+  height: 104rpx;
+  background: rgba(201,168,76,0.1);
+  border: 1rpx solid rgba(201,168,76,0.35);
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+}
+.btn-bottom:active { opacity: 0.75; transform: scale(0.98); }
+
+.btn-bottom-icon {
+  font-size: 40rpx;
+  color: #c9a84c;
+  font-weight: 700;
+  line-height: 1;
+}
+.btn-bottom-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #c9a84c;
+  letter-spacing: 2rpx;
 }

@@ -4,9 +4,12 @@ const { shuffle } = require('../../utils/gojuuon')
 Page({
   data: {
     frontChar: '',
+    backChar: '',
+    backRoma: '',
     cardRoma: '',
-    errorCount: 0,      // 当前牌被标记"不认识"的次数
-    cardExiting: false, // 退场动画
+    errorCount: 0,
+    flipped: false,      // 是否已翻牌（点「忘记了」后）
+    cardExiting: false,  // 退场动画
     animating: false,
     deckCount: 0,
     knownCount: 0,
@@ -33,7 +36,6 @@ Page({
     const s = this._session
 
     if (s.deck.length === 0) {
-      // 全部认识 → 跳统计页
       getApp().globalData.session = s
       wx.redirectTo({ url: '/pages/complete/complete' })
       return
@@ -43,17 +45,34 @@ Page({
     const layers = Math.min(s.deck.length - 1, 4)
     const stackLayers = Array.from({ length: layers }, (_, i) => ({ i }))
 
-    let frontChar
-    if (s.mode === 'kata-hira')      frontChar = card.kata
-    else if (s.mode === 'hira-kata') frontChar = card.hira
-    else                              frontChar = card.kata + '  ' + card.hira
+    let frontChar, backChar, backRoma
+
+    if (s.mode === 'hira-roma') {
+      frontChar = card.hira
+      backChar  = card.roma
+      backRoma  = ''
+    } else if (s.mode === 'kata-hira') {
+      frontChar = card.kata
+      backChar  = card.hira
+      backRoma  = card.roma
+    } else if (s.mode === 'hira-kata') {
+      frontChar = card.hira
+      backChar  = card.kata
+      backRoma  = card.roma
+    } else {
+      // romaji: 正面同时显示两种假名
+      frontChar = card.kata + '  ' + card.hira
+      backChar  = card.roma
+      backRoma  = ''
+    }
 
     const progress = Math.round(s.known.length / s.total * 100)
 
     this.setData({
-      frontChar,
+      frontChar, backChar, backRoma,
       cardRoma: card.roma,
       errorCount: card.errorCount || 0,
+      flipped: false,
       cardExiting: false,
       animating: false,
       deckCount: s.deck.length,
@@ -64,9 +83,9 @@ Page({
     })
   },
 
-  // ── 认识 → 直接移出牌堆 ──
+  // ── 「这个假名我已经认识」→ 直接移出牌堆，不翻牌 ──
   markKnow() {
-    if (this.data.animating) return
+    if (this.data.animating || this.data.flipped) return
     this.setData({ animating: true, cardExiting: true })
     const s = this._session
     const card = s.deck.shift()
@@ -75,26 +94,34 @@ Page({
     setTimeout(() => this._renderCard(), 350)
   },
 
-  // ── 不认识 → 打标记数字，放牌底 ──
+  // ── 「这个假名我忘记了」→ 翻牌显示答案+读音，自动播放发音 ──
   markRetry() {
+    if (this.data.animating || this.data.flipped) return
+    this.setData({ flipped: true, animating: true })
+    wx.vibrateShort({ type: 'light' })
+    // 等翻牌动画完成后播放读音
+    setTimeout(() => {
+      this.setData({ animating: false })
+      this._playAudio()
+    }, 420)
+  },
+
+  // ── 「将其置于牌底」→ errorCount+1，放牌底 ──
+  markBottom() {
     if (this.data.animating) return
+    this.setData({ animating: true, cardExiting: true })
     const s = this._session
     const card = s.deck[0]
     card.errorCount = (card.errorCount || 0) + 1
-    // 先更新徽章，再做退场
-    this.setData({ errorCount: card.errorCount, animating: true })
     wx.vibrateShort({ type: 'light' })
     setTimeout(() => {
-      this.setData({ cardExiting: true })
-      setTimeout(() => {
-        s.deck.shift()
-        s.deck.push(card)
-        this._renderCard()
-      }, 280)
-    }, 160)
+      s.deck.shift()
+      s.deck.push(card)
+      this._renderCard()
+    }, 350)
   },
 
-  // ── 发音按钮 ──
+  // ── 发音按钮（手动）──
   playAudio() {
     this._playAudio()
   },

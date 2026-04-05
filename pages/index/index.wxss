@@ -80,11 +80,28 @@
   background: rgba(201,168,76,0.06);
 }
 
+.mode-label-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  min-width: 220rpx;
+}
+
 .mode-label {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 500;
   color: #f0ede8;
-  min-width: 180rpx;
+}
+
+/* 推荐徽章 */
+.mode-hot {
+  font-size: 18rpx;
+  font-weight: 600;
+  color: #0e0e0f;
+  background: #c9a84c;
+  border-radius: 8rpx;
+  padding: 4rpx 12rpx;
+  letter-spacing: 1rpx;
 }
 
 .mode-desc {

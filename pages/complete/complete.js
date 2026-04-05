@@ -46,15 +46,17 @@ Page({
       .map(c => ({
         kana: modeKey === 'hira-kata' ? c.hira
             : modeKey === 'kata-hira' ? c.kata
+            : modeKey === 'hira-roma' ? c.hira
             : c.kata + ' ' + c.hira,
         roma: c.roma,
         errors: c.errorCount,
       }))
 
     const modeNames = {
+      'hira-roma': '平假名 → 读音',
       'kata-hira': '片假名 → 平假名',
       'hira-kata': '平假名 → 片假名',
-      'romaji':    '假名 → 读音',
+      'romaji':    '两种假名 → 读音',
     }
 
     const now = new Date()
