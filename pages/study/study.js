@@ -25,11 +25,20 @@ Page({
     const session = getApp().globalData.session
     if (!session) { wx.navigateBack(); return }
     this._session = session
+    // 全局音频配置：不受静音键影响，可与其他音频混播
+    wx.setInnerAudioOption({ mixWithOther: true, obeyMuteSwitch: false })
     this._renderCard()
   },
 
   onUnload() {
-    if (this._audioCtx) { this._audioCtx.destroy(); this._audioCtx = null }
+    this._destroyAudio()
+  },
+
+  _destroyAudio() {
+    if (this._audioCtx) {
+      try { this._audioCtx.destroy() } catch (e) {}
+      this._audioCtx = null
+    }
   },
 
   _renderCard() {
@@ -129,13 +138,28 @@ Page({
   _playAudio() {
     const roma = this.data.cardRoma
     if (!roma) return
-    if (!this._audioCtx) {
-      this._audioCtx = wx.createInnerAudioContext()
-      this._audioCtx.obeyMuteSwitch = false
-    }
-    this._audioCtx.stop()
-    this._audioCtx.src = `/audio/${roma}.mp3`
-    this._audioCtx.play()
+
+    // 每次销毁旧实例，重新创建，避免真机上状态残留导致静默失败
+    this._destroyAudio()
+
+    const ctx = wx.createInnerAudioContext()
+    ctx.obeyMuteSwitch = false
+    ctx.autoplay = false
+
+    ctx.onError(e => {
+      console.error('[audio] 播放失败', roma, JSON.stringify(e))
+      wx.showToast({ title: '音频加载失败', icon: 'none', duration: 1200 })
+    })
+
+    // 先设 src，等 canplay 再 play（兼容低版本 / 弱网）
+    ctx.onCanplay(() => { ctx.play() })
+
+    ctx.src = `/audio/${roma}.mp3`
+
+    // 同时直接调用 play，部分机型 canplay 不触发时兜底
+    ctx.play()
+
+    this._audioCtx = ctx
   },
 
   goBack() {
