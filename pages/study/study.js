@@ -24,10 +24,19 @@ Page({
   onShow() {
     const session = getApp().globalData.session
     if (!session) { wx.navigateBack(); return }
+    if (session.streak === undefined) session.streak = 0
     this._session = session
-    // 全局音频配置：不受静音键影响，可与其他音频混播
     wx.setInnerAudioOption({ mixWithOther: true, obeyMuteSwitch: false })
+    wx.showShareMenu({ withShareTicket: false, menus: ['shareAppMessage'] })
     this._renderCard()
+  },
+
+  onShareAppMessage() {
+    const { knownCount, total } = this.data
+    return {
+      title: `我正在用五十音记忆闪卡记假名，已记住 ${knownCount}/${total}！`,
+      path: '/pages/index/index',
+    }
   },
 
   onUnload() {
@@ -100,6 +109,18 @@ Page({
     const card = s.deck.shift()
     s.known.push(card)
     wx.vibrateShort({ type: 'medium' })
+
+    // 连续答对计数
+    s.streak += 1
+    const streak = s.streak
+    if (streak === 5) {
+      wx.showToast({ title: '🔥 连续5张！', icon: 'none', duration: 1500 })
+    } else if (streak === 10) {
+      wx.showToast({ title: '⚡ 连续10张！太厉害了！', icon: 'none', duration: 1500 })
+    } else if (streak >= 15 && streak % 5 === 0) {
+      wx.showToast({ title: `🚀 连续${streak}张！无敌！`, icon: 'none', duration: 1500 })
+    }
+
     setTimeout(() => this._renderCard(), 350)
   },
 
@@ -108,6 +129,8 @@ Page({
     if (this.data.animating || this.data.flipped) return
     this.setData({ flipped: true, animating: true })
     wx.vibrateShort({ type: 'light' })
+    // 连续答对计数归零
+    this._session.streak = 0
     // 等翻牌动画完成后播放读音
     setTimeout(() => {
       this.setData({ animating: false })
@@ -123,6 +146,7 @@ Page({
     const card = s.deck[0]
     card.errorCount = (card.errorCount || 0) + 1
     wx.vibrateShort({ type: 'light' })
+    this._session.streak = 0
     setTimeout(() => {
       s.deck.shift()
       s.deck.push(card)

@@ -17,7 +17,14 @@
       "Bash(ls -la *.mp3)",
       "Bash(ffmpeg -version)",
       "Bash(node -e \"console.log\\(require\\(''''ffmpeg-static''''\\)\\)\")",
-      "Bash(node scripts/compress-audio.js)"
+      "Bash(node scripts/compress-audio.js)",
+      "Bash(claude config:*)",
+      "Bash(where claude:*)",
+      "Read(//c/Users/GUIYI DONG/AppData/Local/Programs/**)",
+      "Bash(claude --version)",
+      "Bash(claude -p)",
+      "Bash(bash scripts/ai_loop.sh 2)",
+      "Bash(claude -p --help)"
     ]
   }
 }

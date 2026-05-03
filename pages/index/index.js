@@ -13,6 +13,21 @@ Page({
     totalCards: gojuuon.length,
   },
 
+  onLoad() {
+    wx.showShareMenu({ withShareTicket: false, menus: ['shareAppMessage', 'shareTimeline'] })
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '五十音记忆闪卡 · 2小时记住全部假名！',
+      path: '/pages/index/index',
+    }
+  },
+
+  onShareTimeline() {
+    return { title: '五十音记忆闪卡 · 翻牌记忆日语假名' }
+  },
+
   selectMode(e) {
     this.setData({ mode: e.currentTarget.dataset.id })
   },

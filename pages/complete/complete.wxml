@@ -54,14 +54,24 @@
 
   <!-- 操作按钮 -->
   <view class="actions">
+
+    <!-- 分享给朋友（open-type="share" 触发 onShareAppMessage） -->
+    <button class="btn-share" open-type="share">
+      <view class="share-icon">↗</view>
+      <view class="share-text">分享学习报告</view>
+    </button>
+
+    <!-- 下载到相册 -->
     <view class="btn-download {{saving ? 'btn-saving' : ''}}" bindtap="saveReport">
       <view class="dl-icon">↓</view>
-      <view class="dl-text">{{saving ? '生成中...' : '下载学习报告'}}</view>
+      <view class="dl-text">{{saving ? '生成中...' : '保存到相册'}}</view>
     </view>
+
     <view class="btn-row-2">
       <view class="btn-secondary" bindtap="restart">再来一遍</view>
       <view class="btn-secondary" bindtap="goHome">回首页</view>
     </view>
+
   </view>
 
   <!-- 隐藏画布：用于生成报告图片 -->

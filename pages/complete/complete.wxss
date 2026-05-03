@@ -193,6 +193,36 @@
   gap: 20rpx;
 }
 
+/* ── 分享按钮（微信 button open-type="share"）── */
+.btn-share {
+  width: 100%;
+  height: 104rpx;
+  background: #3aaa7a;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: 104rpx;
+}
+.btn-share::after { border: none; }
+.btn-share:active { opacity: 0.8; transform: scale(0.98); }
+
+.share-icon {
+  font-size: 36rpx;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1;
+}
+.share-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
 .btn-download {
   height: 104rpx;
   background: #c9a84c;

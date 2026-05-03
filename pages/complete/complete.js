@@ -15,11 +15,14 @@ Page({
   },
 
   _session: null,
+  _reportTempFilePath: '',   // 缓存报告图路径，供分享用
 
   onLoad() {
     const s = getApp().globalData.session
     if (!s) return
     this._session = s
+    // 启用右上角菜单分享
+    wx.showShareMenu({ withShareTicket: false, menus: ['shareAppMessage', 'shareTimeline'] })
 
     const known = s.known
     const total = s.total
@@ -70,62 +73,85 @@ Page({
     })
   },
 
-  // ── 下载报告为图片 ──
+  // 页面渲染完成后，预先生成报告图（供分享时用）
+  onReady() {
+    this._buildCanvas(path => { this._reportTempFilePath = path })
+  },
+
+  // ── 分享给朋友 ──
+  onShareAppMessage() {
+    const { firstTryPct, total } = this.data
+    return {
+      title: `我记住了全部 ${total} 个假名！一次认识率 ${firstTryPct}%`,
+      path: '/pages/index/index',
+      imageUrl: this._reportTempFilePath || '',
+    }
+  },
+
+  // ── 分享到朋友圈 ──
+  onShareTimeline() {
+    const { firstTryPct, total } = this.data
+    return {
+      title: `五十音记忆闪卡 · 全部 ${total} 个假名学完！一次认识率 ${firstTryPct}%`,
+      imageUrl: this._reportTempFilePath || '',
+    }
+  },
+
+  // ── 下载报告到相册 ──
   saveReport() {
     if (this.data.saving) return
     this.setData({ saving: true })
     wx.showLoading({ title: '生成中...' })
 
-    const query = wx.createSelectorQuery().in(this)
-    query.select('#reportCanvas').fields({ node: true, size: true }, res => {
-      if (!res || !res.node) {
-        wx.hideLoading()
-        wx.showToast({ title: '画布错误', icon: 'none' })
+    this._buildCanvas(path => {
+      wx.hideLoading()
+      if (!path) {
+        wx.showToast({ title: '生成失败', icon: 'none' })
         this.setData({ saving: false })
         return
       }
-      const canvas = res.node
-      const info = wx.getSystemInfoSync()
-      const dpr = info.pixelRatio || 2
-      const W = 600  // 逻辑宽度
+      this._reportTempFilePath = path
+      wx.saveImageToPhotosAlbum({
+        filePath: path,
+        success: () => wx.showToast({ title: '已保存到相册', icon: 'success' }),
+        fail: () => wx.showModal({
+          title: '需要相册权限',
+          content: '请在右上角菜单 → 设置 → 允许访问相册',
+          showCancel: false,
+        }),
+        complete: () => this.setData({ saving: false }),
+      })
+    }, true)
+  },
 
+  // ── 核心：绘制 Canvas 并返回临时文件路径 ──
+  _buildCanvas(callback, showErr) {
+    const query = wx.createSelectorQuery().in(this)
+    query.select('#reportCanvas').fields({ node: true, size: true }, res => {
+      if (!res || !res.node) {
+        if (showErr) wx.showToast({ title: '画布错误', icon: 'none' })
+        callback('')
+        return
+      }
+      const canvas = res.node
+      const dpr = wx.getSystemInfoSync().pixelRatio || 2
+      const W = 600
       const { distribution, hardest } = this.data
-      // 预计高度
       let H = 490
       if (distribution.length > 0) H += distribution.length * 52 + 60
       if (hardest.length > 0)      H += hardest.length * 56 + 60
-      H += 60  // footer
+      H += 60
 
       canvas.width  = W * dpr
       canvas.height = H * dpr
-
       const ctx = canvas.getContext('2d')
       ctx.scale(dpr, dpr)
       this._drawReport(ctx, W, H)
 
       wx.canvasToTempFilePath({
         canvas,
-        success: r => {
-          wx.hideLoading()
-          wx.saveImageToPhotosAlbum({
-            filePath: r.tempFilePath,
-            success: () => wx.showToast({ title: '已保存到相册', icon: 'success' }),
-            fail: () => {
-              // 引导用户开权限
-              wx.showModal({
-                title: '需要相册权限',
-                content: '请在右上角菜单 → 设置 → 允许访问相册',
-                showCancel: false,
-              })
-            },
-          })
-        },
-        fail: e => {
-          wx.hideLoading()
-          console.error(e)
-          wx.showToast({ title: '导出失败', icon: 'none' })
-        },
-        complete: () => this.setData({ saving: false }),
+        success: r => callback(r.tempFilePath),
+        fail: e => { console.error(e); callback('') },
       })
     }).exec()
   },
