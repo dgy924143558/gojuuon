@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bronze: #CD7F32;
+}
+
+body {
+  background-color: #030712;
+}
+
+.wallet-adapter-button {
+  background: linear-gradient(135deg, #9945FF, #14F195) !important;
+  border-radius: 0.75rem !important;
+  font-weight: 600 !important;
+}
